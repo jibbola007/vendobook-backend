@@ -1,7 +1,12 @@
 import express from 'express';
 import multer from 'multer';
-import { addExpense, getExpenses, deleteExpense,  updateExpense } from '../controllers/expenseController.js';
-
+import {
+  addExpense,
+  getExpenses,
+  deleteExpense,
+  getExpenseById,
+  updateExpense
+} from '../controllers/expenseController.js';
 const router = express.Router();
 
 const storage = multer.diskStorage({
@@ -19,7 +24,7 @@ router.post('/', upload.single('receipt'), addExpense);
 router.get('/', getExpenses);
 router.delete('/:id', deleteExpense);
 router.put('/:id', upload.single('receipt'), updateExpense);
-
+router.get('/:id', getExpenseById);
 
 export default router;
 

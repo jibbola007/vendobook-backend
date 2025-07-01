@@ -47,30 +47,33 @@ export const deleteExpense = async (req, res) => {
   }
 };
 
-export const updateExpense = async (req, res) => {
+export const getExpenseById = async (req, res) => {
   try {
     const expense = await Expense.findById(req.params.id);
-    if (!expense) return res.status(404).json({ message: 'Expense not found' });
-
-    const { amount, description, category } = req.body;
-
-    if (amount) expense.amount = amount;
-    if (description) expense.description = description;
-    if (category) expense.category = category;
-
-    // Handle new file upload
-    if (req.file) {
-      // delete old receipt file if it exists
-      if (expense.receipt) {
-        const oldPath = path.join('uploads', expense.receipt);
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-      }
-      expense.receipt = req.file.filename;
-    }
-
-    await expense.save();
+    if (!expense) return res.status(404).json({ error: 'Expense not found' });
     res.json(expense);
   } catch (err) {
-    res.status(500).json({ message: 'Error updating expense', error: err.message });
+    res.status(500).json({ error: 'Server error' });
   }
 };
+export const updateExpense = async (req, res) => {
+  try {
+    const { amount, description, category } = req.body;
+    const updateData = { amount, description, category };
+    if (req.file) {
+      updateData.receipt = req.file.filename;
+    }
+
+    const updated = await Expense.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    if (!updated) return res.status(404).json({ error: 'Not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: 'Update failed' });
+  }
+};
+
