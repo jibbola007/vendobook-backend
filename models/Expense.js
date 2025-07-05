@@ -11,6 +11,11 @@ const ExpenseSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+
+  currency: {
+    type: String,
+    default: 'NGN' // or '₦'
+  }
 });
 
 
