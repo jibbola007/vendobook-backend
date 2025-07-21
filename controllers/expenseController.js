@@ -8,10 +8,11 @@ export const addExpense = async (req, res) => {
     const receipt = req.file ? req.file.filename : null;
 
     const newExpense = new Expense({
-      amount,
-      description,
-      category,
-      receipt,
+      amount: req.body.amount,
+      description: req.body.description,
+      category: req.body.category,
+      currency: req.body.currency, // ✅ Add this line
+      receipt: req.file?.filename,
     });
 
     await newExpense.save();
@@ -58,10 +59,16 @@ export const getExpenseById = async (req, res) => {
 };
 export const updateExpense = async (req, res) => {
   try {
-    const { amount, description, category } = req.body;
-    const updateData = { amount, description, category };
+    const expense = await Expense.findById(req.params.id);
+    if (!expense) return res.status(404).json({ message: 'Expense not found' });
+
+    expense.amount = req.body.amount;
+    expense.description = req.body.description;
+    expense.category = req.body.category;
+    expense.currency = req.body.currency; // ✅ This is the new part
+
     if (req.file) {
-      updateData.receipt = req.file.filename;
+      expense.receipt = req.file.filename;
     }
 
     const updated = await Expense.findByIdAndUpdate(
