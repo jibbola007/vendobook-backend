@@ -71,11 +71,8 @@ export const updateExpense = async (req, res) => {
       expense.receipt = req.file.filename;
     }
 
-    const updated = await Expense.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    );
+    const updated = await expense.save();
+
 
     if (!updated) return res.status(404).json({ error: 'Not found' });
     res.json(updated);
