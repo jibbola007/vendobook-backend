@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
 const createToken = (user) => {
-  return jwt.sign({ id: user._id }, 'yourSecretKey', { expiresIn: '1d' });
+  return jwt.sign({ id: user._id, email: user.email }, 'yourSecretKey', { expiresIn: '1d' });
 };
 
 export const signup = async (req, res) => {
