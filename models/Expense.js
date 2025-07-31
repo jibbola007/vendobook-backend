@@ -1,6 +1,4 @@
 import mongoose from 'mongoose';
-import { updateExpense } from '../controllers/expenseController.js';
-
 
 const ExpenseSchema = new mongoose.Schema({
   amount: Number,
@@ -11,13 +9,15 @@ const ExpenseSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-
   currency: {
     type: String,
-    default: 'NGN' 
-  }
+    default: 'NGN',
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true, // Ensures every expense must be tied to a user
+  },
 });
-
-
 
 export default mongoose.model('Expense', ExpenseSchema);

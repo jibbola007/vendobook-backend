@@ -1,9 +1,16 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
+dotenv.config();
 
+// Use the JWT secret from your .env file securely
 const createToken = (user) => {
-  return jwt.sign({ id: user._id, email: user.email }, 'yourSecretKey', { expiresIn: '1d' });
+  return jwt.sign(
+    { id: user._id, email: user.email },
+    process.env.JWT_SECRET,  // ✅ Use environment variable
+    { expiresIn: '1d' }
+  );
 };
 
 export const signup = async (req, res) => {
@@ -17,7 +24,6 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: 'Email already in use' });
     }
 
-    // ✅ Assign raw password, let Mongoose hash it using pre-save
     const user = new User({ email, password });
     await user.save();
     console.log("✅ User saved to DB:", user);
@@ -52,7 +58,10 @@ export const login = async (req, res) => {
     }
 
     const token = createToken(user);
-    return res.status(200).json({ user: { id: user._id, email: user.email }, token });
+    return res.status(200).json({
+      user: { id: user._id, email: user.email },
+      token
+    });
 
   } catch (err) {
     console.error("🔥 LOGIN ERROR:", err);
@@ -67,11 +76,10 @@ export const resetPassword = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    
     user.password = password;
     await user.save();
 
-   res.status(200).json({ message: 'Password reset successful' });
+    res.status(200).json({ message: 'Password reset successful' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });

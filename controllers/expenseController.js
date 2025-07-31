@@ -4,15 +4,16 @@ import path from 'path';
 
 export const addExpense = async (req, res) => {
   try {
-    const { amount, description, category } = req.body;
+    const { amount, description, category, currency } = req.body;
     const receipt = req.file ? req.file.filename : null;
 
     const newExpense = new Expense({
-      amount: req.body.amount,
-      description: req.body.description,
-      category: req.body.category,
-      currency: req.body.currency, // ✅ Add this line
-      receipt: req.file?.filename,
+      amount,
+      description,
+      category,
+      currency,
+      receipt,
+      user: req.user.id, // ✅ Attach the logged-in user’s ID
     });
 
     await newExpense.save();
@@ -24,7 +25,7 @@ export const addExpense = async (req, res) => {
 
 export const getExpenses = async (req, res) => {
   try {
-    const expenses = await Expense.find().sort({ createdAt: -1 });
+    const expenses = await Expense.find({ user: req.user.id });
     res.json(expenses);
   } catch (err) {
     res.status(500).json({ error: err.message });

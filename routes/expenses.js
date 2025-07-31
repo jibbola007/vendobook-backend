@@ -7,8 +7,12 @@ import {
   getExpenseById,
   updateExpense
 } from '../controllers/expenseController.js';
+
+import { verifyToken } from '../middleware/authMiddleware.js'; // ✅ Import middleware
+
 const router = express.Router();
 
+// Multer config
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
@@ -20,11 +24,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-router.post('/', upload.single('receipt'), addExpense);
-router.get('/', getExpenses);
-router.delete('/:id', deleteExpense);
-router.put('/:id', upload.single('receipt'), updateExpense);
-router.get('/:id', getExpenseById);
+// ✅ Secure your routes using verifyToken
+router.post('/', verifyToken, upload.single('receipt'), addExpense);
+router.get('/', verifyToken, getExpenses);
+router.delete('/:id', verifyToken, deleteExpense);
+router.put('/:id', verifyToken, upload.single('receipt'), updateExpense);
+router.get('/:id', verifyToken, getExpenseById);
 
 export default router;
-
